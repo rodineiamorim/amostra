@@ -1,0 +1,20 @@
+<script>
+    document.getElementById('field-search').addEventListener('keyup', (event) => {
+        document.getElementById('label-search').innerHTML = document.getElementById('field-search').value;
+        if (document.getElementById('field-search').value == '')
+            reset_label();
+    }, false);
+
+    document.getElementById('find-clear').addEventListener('click', (event) => {
+        document.getElementById('field-search').value = '';
+        reset_label();
+    }, false);
+
+    function reset_label() {
+        document.getElementById('label-search').innerHTML = 'Lista de produtos';
+    }
+
+    reset_label();
+</script>
+
+</html>

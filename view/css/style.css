@@ -1,0 +1,16 @@
+.rtitle {
+    position: relative;
+    float: left;
+    padding-top: 5px!important;
+    padding: 10px;
+    font-weight: 900!important;
+    font-size: 1.5em;
+}
+
+.rlabel {
+    float: left;
+    background-color: lightgrey;
+    padding: 20px;
+    font-size: 1.5em;
+    color: gray;
+}
