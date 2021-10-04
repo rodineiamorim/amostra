@@ -1,72 +1,146 @@
 <%- include('../view/head.ejs')-%>
-    <style>
-        .select,
-        #locale {
-            width: 100%;
-        }
-        
-        .like {
-            margin-right: 10px;
-        }
-    </style>
+<style>
+  .select,
+  #locale {
+    width: 100%;
+  }
 
-    <div class="col-md-12" style="float:right;padding-top:10px;">
-        <label><%= products.length + ' PRODUTO(s) ENCONTRADO(s)' %></label>
-    </div>
-    <section class="panel panel-default">
-        <div class="panel-body">
+  .like {
+    margin-right: 10px;
+  }
+</style>
 
-            <table id="products" class="table table-bordered" style='width:80%;margin-left:auto;margin-right:auto;'>
-                <!--
-                  <thead>
-                      <tr>
-                          <th class="text-center">...</th>
-                          <th class="text-center">Descricao</th>
-                          <th class="text-center">Preco</th>
-                      </tr>
-                  </thead>
-                -->
-                <tbody>
-                    <% products.forEach(function(product){ %>
-                        <tr>
-                            <td style='width:20%'>
-                                <% if( product.image1 != "" ) { %>
-                                    <img src="<%= product.image1 %>" style="width:60px;height:60px;" />
-                                    <% } %>
-                                        <% if( product.image2 != "" ) { %>
-                                            <img src="<%= product.image2 %>" style="width:60px;height:60px;" />
-                                            <% } %>
-                                                <% if( product.image3 != "" ) { %>
-                                                    <img src="<%= product.image3 %>" style="width:60px;height:60px;" />
-                                                    <% } %>
-                                                        <% if( product.image4 != "" ) { %>
-                                                            <img src="<%= product.image4 %>" style="width:60px;height:60px;" />
-                                                            <% } %>
-                            </td>
-                            <td style='width:60%'>
-                                <b><%= product.shortName %></b><br>
-                                <%= product.description %>
-                            </td>
-                            <td style='width:20%'>
-                                R$
-                                <%= product.price %>
-                                    <% if( product.discount != "0,00" ) { %>
-                                        <%= 'por R$ ' + product.discount %>
-                                            <% } %>
-                            </td>
-                        </tr>
-                        <% })%>
-                </tbody>
-            </table>
-        </div>
-    </section>
+<div class="col-md-12" style="float:right;padding-top:10px;">
+  <label>
+    <%= products.length + ' PRODUTO(s) ENCONTRADO(s)' %>
+  </label>
+</div>
+<section class="panel panel-default">
+  <div class="panel-body">
+    <table id="products" class="table table-bordered">
+      <tbody>
+        <% products.forEach(function(product){ %>
+        <tr>
+          <td style='width:20%;'>
+            <% if( product.image1 !="" ) { %>
+            <img src="<%= product.image1 %>" />
+            <% } %>
+            <% if( product.image2 !="" ) { %>
+            <img src="<%= product.image2 %>" />
+            <% } %>
+            <% if( product.image3 !="" ) { %>
+            <img src="<%= product.image3 %>" />
+            <% } %>
+            <% if( product.image4 !="" ) { %>
+            <img src="<%= product.image4 %>" />
+            <% } %>
+          </td>
+          <td style='width:60%;'>
+            <b>
+              <%= product.shortName %>
+            </b><br>
+            <%= product.description %>
+          </td>
+          <td style='width:20%;'>
+            <%= 'R$ ' + product.price %>
+            <% if( product.discount != "0,00" ) { %>
+            <%= 'por R$ ' + product.discount %>
+            <% } %>
+          </td>
+        </tr>
+        <% })%>
+      </tbody>
+    </table>
+    <ul id="pagelist" class="pagination pagination-sm rnavig" style="display:none;">
+      <li class="page-item">
+        <div id="pageprior" class="page-link" href="#">
+          <<</div>
+      </li>
+      <li class="page-item"><a class="page-link" href="#" id="viewpage">1</a></li>
+      <li class="page-item">
+        <div id="pagenext" class="page-link" href="#">>></div>
+      </li>
+    </ul>
+  </div>
+</section>
 
-    <script>
-        $(function() {
-            initTable()
+<script>
+  let rows, rpp = <%= rpp %>,
+    seek, target = 1;
+  var lastpage;
+  var displaypage;
 
-            $('#products').change(initTable)
-        })
-    </script>
+  rows = document.getElementById('products').getElementsByTagName('tr');
+  seek = document.getElementById('field-search');
+  document.getElementById('perpage').value = rpp;
 
-    <%- include('../view/foot.ejs')-%>
+  seek.addEventListener('keyup', function() {
+    filtersearch();
+  });
+
+  function filtersearch() {
+    let display = 0, count = 0;
+    itempage = 1;;
+    displaypage = 1;
+    lastpage = 1;
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].setAttribute("data-page", itempage);
+      if (rows[i].cells[target].innerHTML.indexOf(seek.value) > -1) {
+        rows[i].style.display = (((count < rpp) && (displaypage == itempage)) ? 'block' : 'none');
+        display++;
+      } else {
+        rows[i].style.display = 'none';
+      }
+      count++;
+      if (count >= rpp) {
+        count = 0;
+        itempage++
+        lastpage++;
+      }
+    }
+    if (seek.value != "") {
+      document.getElementById('infofilter').innerHTML = ' <span>' + display + '</span> COINCIDENCIAS';
+    } else
+      document.getElementById('infofilter').innerHTML = '';
+    if (itempage > 1)
+      document.getElementById('pagelist').style.display = 'block';
+    else
+      document.getElementById('pagelist').style.display = 'none';
+  }
+
+  function navigate(direction) {
+    let thispage;
+    displaypage += direction;
+    if ((displaypage < 1) && (direction == -1))
+      displaypage = rpp;
+    else if ((displaypage > lastpage) && (direction == 1))
+      displaypage = 1;
+    for (let i = 0; i < rows.length; i++) {
+      thispage = rows[i].getAttribute("data-page");
+      if (displaypage == thispage)
+        rows[i].style.display = 'block';
+      else
+        rows[i].style.display = 'none';
+    }
+    document.getElementById('viewpage').innerHTML = displaypage;
+  }
+
+  document.getElementById('pageprior').addEventListener('click', function() {
+    navigate(-1)
+  });
+
+  document.getElementById('pagenext').addEventListener('click', function() {
+    navigate(1)
+  });
+
+  document.getElementById('perpage').addEventListener('change',function(){
+    rpp = this.value;
+    filtersearch();
+    navigate(0);
+  })
+
+  filtersearch();
+  seek.focus();
+</script>
+
+<%- include('../view/foot.ejs')-%>

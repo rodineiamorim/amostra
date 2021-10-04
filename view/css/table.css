@@ -1,0 +1,20 @@
+#products {
+    width:80%;
+    margin-left:auto;
+    margin-right:auto;
+    border: none;
+}
+
+#products tr {
+    background-color: white;
+    transition: background-color 1s;
+}
+
+#products tr:hover {
+    background-color: whitesmoke;
+}
+
+img {
+    width: 60px;
+    height: 60px;;
+}

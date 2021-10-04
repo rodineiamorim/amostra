@@ -15,7 +15,7 @@ const client = new MongoClient(uri);
 app.use(body.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/view'));
 
-async function data(filter, res) {
+async function data(filter, res, rpp) {
     await client.connect();
     const db = client.db("local");
     const products = db.collection("products");
@@ -26,13 +26,23 @@ async function data(filter, res) {
             linha.discount = linha.discount.toFixed(2).replace('.', ',');
             linha.price = linha.price.toFixed(2).replace('.', ',')
         });
-        res.render(__dirname + "/view/list.ejs", { products: result });
+        res.render(__dirname + "/view/list.ejs", { products: result, rpp: rpp });
     });
 }
 
+app.post("/", function(req, res) {
+    let filter = req.body.fieldsearch;
+    let rpp = req.body.recperpage;
+    let find = {};
+    if( rpp == undefined )
+        rpp = 3;
+    if( filter != "" )
+        find = {"shortName": {'$regex': filter, '$options':'i'}}
+    data(find, res, rpp)
+})
+
 app.get("/", function(req, res) {
-    console.log(1);
-    data({}, res)
+    data({}, res, 3, "")
 })
 
 app.listen(3000, function() {

@@ -14,3 +14,22 @@
     font-size: 1.5em;
     color: gray;
 }
+
+.rnavig {
+    padding-left: 30px;
+    width: 10em;
+}
+.rnavig li {
+    position: relative;
+    float: left;
+    width: 33%;
+}
+
+.rresultfilter {
+    position: fixed; 
+    float:right;
+    padding-top:10px;
+    bottom:30px;
+    padding-left: 30px;
+}
+
